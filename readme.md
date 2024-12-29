@@ -2,4 +2,4 @@
 
 git clone https://github.com/skepticfx/nvim.config ~/.config/nvim
 
-Uses Lazy plugin manager. 
+Uses Lazy plugin manager 
