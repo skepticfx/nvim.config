@@ -1,0 +1,5 @@
+require("fx.lazy")
+require("fx.colors")
+require("fx.remap")
+require("fx.lsp")
+require("fx.set")
