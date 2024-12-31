@@ -10,7 +10,7 @@ vim.keymap.set('n', '<C-f>', builtin.find_files, { desc = 'Telescope find files'
 vim.keymap.set('n', '<C-g>', builtin.git_files, { desc = 'Telescope find git files' })
 vim.keymap.set('n', '<C-b>', builtin.buffers, { desc = 'Telescope find buffers' })
 vim.keymap.set('n', '<C-s>', function()
-	builtin.grep_string({ search = vim.fn.input("Grep > ") });
+    builtin.grep_string({ search = vim.fn.input("Grep > ") });
 end)
 
 -- primetime
@@ -82,4 +82,10 @@ vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
 
+-- indent the entire file in place
+vim.keymap.set('n', '<C-0>', function()
+    local pos = vim.fn.getpos(".")  -- Save current cursor position
+    vim.cmd("normal gg=G")                -- Indent the entire file
+    vim.fn.setpos(".", pos)        -- Restore cursor position
+end, { noremap = true })
 
