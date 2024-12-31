@@ -6,4 +6,4 @@ require("fx.set")
 require("fx.git")
 require("fx.misc")
 require("fx.buffer")
-
+require("fx.status")
