@@ -6,14 +6,18 @@ vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
 
 -- telescope and LSP
 local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<C-f>', builtin.find_files, { desc = 'Telescope find files' })
-vim.keymap.set('n', '<C-g>', builtin.git_files, { desc = 'Telescope find git files' })
-vim.keymap.set('n', '<C-b>', builtin.buffers, { desc = 'Telescope find buffers' })
-vim.keymap.set('n', '<C-s>', function()
+vim.keymap.set('n', '<leader>tf', builtin.find_files, { desc = 'Telescope find files' })
+vim.keymap.set('n', '<leader>tg', builtin.git_files, { desc = 'Telescope find git files' })
+vim.keymap.set('n', '<leader>tb', builtin.buffers, { desc = 'Telescope find buffers' })
+vim.keymap.set('n', '<leader>ts', function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") });
 end)
-vim.keymap.set('n', '<C-t>', builtin.lsp_references, { desc = 'References' })
-vim.keymap.set('n', '<C-i>', builtin.lsp_implementations, { desc = 'Implementations' })
+vim.keymap.set('n', '<leader>tr', builtin.lsp_references, { desc = 'References' })
+vim.keymap.set('n', '<leader>ti', builtin.lsp_implementations, { desc = 'Implementations' })
+vim.keymap.set('n', '<leader>ts', builtin.lsp_document_symbols, { desc = 'Symbols in this document' })
+vim.keymap.set('n', '<leader>tF', function()
+    require('telescope.builtin').lsp_document_symbols({ symbols = { 'function' } })
+end, { desc = "Search functions in current file" })
 
 -- primetime
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
