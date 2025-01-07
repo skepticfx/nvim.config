@@ -21,6 +21,17 @@ end, { desc = "Search functions in current file" })
 vim.keymap.set('n', '<leader>tM', function()
     require('telescope.builtin').lsp_document_symbols({ symbols = { 'method' } })
 end, { desc = "Search methods in current file" })
+function SaveAndQuitSession()
+    if vim.v.this_session ~= "" then
+        vim.cmd("mksession! " .. vim.v.this_session)
+        print("Session saved to: " .. vim.v.this_session)
+    else
+        print("No session currently associated.")
+    end
+    vim.cmd("qa")
+end
+vim.keymap.set('n', '<leader>ss', SaveAndQuitSession, { desc = "Save session and quit" })
+
 
 -- primetime
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
