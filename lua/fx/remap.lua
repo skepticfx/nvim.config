@@ -4,7 +4,7 @@
 -- netrw
 vim.keymap.set('n', '<leader>pv', vim.cmd.Ex)
 
--- telescope
+-- telescope and LSP
 local builtin = require('telescope.builtin')
 vim.keymap.set('n', '<C-f>', builtin.find_files, { desc = 'Telescope find files' })
 vim.keymap.set('n', '<C-g>', builtin.git_files, { desc = 'Telescope find git files' })
@@ -12,6 +12,8 @@ vim.keymap.set('n', '<C-b>', builtin.buffers, { desc = 'Telescope find buffers' 
 vim.keymap.set('n', '<C-s>', function()
     builtin.grep_string({ search = vim.fn.input("Grep > ") });
 end)
+vim.keymap.set('n', '<C-t>', builtin.lsp_references, { desc = 'References' })
+vim.keymap.set('n', '<C-i>', builtin.lsp_implementations, { desc = 'Implementations' })
 
 -- primetime
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -53,31 +55,6 @@ vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
-vim.keymap.set(
-    "n",
-    "<leader>ee",
-    "oif err != nil {<CR>}<Esc>Oreturn err<Esc>"
-)
-
-vim.keymap.set(
-    "n",
-    "<leader>ea",
-    "oassert.NoError(err, \"\")<Esc>F\";a"
-)
-
-vim.keymap.set(
-    "n",
-    "<leader>ef",
-    "oif err != nil {<CR>}<Esc>Olog.Fatalf(\"error: %s\\n\", err.Error())<Esc>jj"
-)
-
-vim.keymap.set(
-    "n",
-    "<leader>el",
-    "oif err != nil {<CR>}<Esc>O.logger.Error(\"error\", \"error\", err)<Esc>F.;i"
-)
-
-
 vim.keymap.set("n", "<leader><leader>", function()
     vim.cmd("so")
 end)
@@ -88,4 +65,58 @@ vim.keymap.set('n', '<C-0>', function()
     vim.cmd("normal gg=G")                -- Indent the entire file
     vim.fn.setpos(".", pos)        -- Restore cursor position
 end, { noremap = true })
+
+-- Copy the line + error message in the current line to clipboard
+vim.keymap.set("n", "<leader>ce", function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local line = vim.fn.line(".") - 1 -- Current line (0-based)
+	local diagnostics = vim.diagnostic.get(bufnr, { lnum = line })
+	local current_line_text = vim.fn.getline(line + 1) -- Get the current line's text
+
+	-- Collect diagnostic messages for the line
+	local diagnostic_messages = {}
+	for _, diagnostic in ipairs(diagnostics) do
+		table.insert(diagnostic_messages, diagnostic.message)
+	end
+
+	if #diagnostic_messages > 0 then
+		-- Prepare the combined text
+		local combined_text = current_line_text .. "\n-- Diagnostics: " .. table.concat(diagnostic_messages, "; ")
+
+		-- Copy the combined text to clipboard and append it as the next line
+		vim.fn.setreg("+", combined_text)
+		print("Copied line and diagnostics to clipboard" )
+	else
+		print("No diagnostics on this line")
+	end
+end, { desc = "Copy current line and diagnostics as the next line" })
+
+
+vim.keymap.set("v", "<leader>ce", function()
+	local bufnr = vim.api.nvim_get_current_buf()
+	local start_line = vim.fn.line("v") - 1 -- Start of the visual selection (0-based)
+	local end_line = vim.fn.line(".") - 1 -- End of the visual selection (0-based)
+	local lines = vim.fn.getline(start_line + 1, end_line + 1) -- Get selected lines
+
+	-- Collect diagnostic messages for the selected range
+	local diagnostic_messages = {}
+	for lnum = start_line, end_line do
+		local diagnostics = vim.diagnostic.get(bufnr, { lnum = lnum })
+		for _, diagnostic in ipairs(diagnostics) do
+			table.insert(diagnostic_messages, string.format("[%d:%d] %s", lnum + 1, diagnostic.col, diagnostic.message))
+		end
+	end
+
+	if #diagnostic_messages > 0 then
+		-- Prepare the combined text
+		local selected_text = table.concat(lines, "\n")
+		local combined_text = selected_text .. "\n-- Diagnostics: " .. table.concat(diagnostic_messages, "; ")
+
+		-- Copy the combined text to the clipboard
+		vim.fn.setreg("+", combined_text)
+		print("Copied selection and diagnostics to clipboard")
+	else
+		print("No diagnostics in the selected range")
+	end
+end, { desc = "Copy selection and diagnostics" })
 

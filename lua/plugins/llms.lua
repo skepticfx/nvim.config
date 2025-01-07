@@ -1,0 +1,3 @@
+return {
+    "jackMort/ChatGPT.nvim"
+}
